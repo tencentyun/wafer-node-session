@@ -1,0 +1,12 @@
+{
+  "name": "wafer-node-session",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "co": "^4.6.0",
+    "express-session": "^1.15.2",
+    "pify": "^2.3.0",
+    "request": "^2.81.0"
+  }
+}
