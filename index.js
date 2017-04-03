@@ -62,11 +62,17 @@ function session(options = {}) {
                     next();
                 }
             } catch (err) {
-                response.json({
+                const errObj = {
                     [constants.WX_SESSION_MAGIC_ID]: 1,
                     error: constants.ERR_INVALID_SESSION,
-                    message: '会话已失效，请重新登录：' + err.message
-                });
+                    message: '会话已失效，请重新登录：' + errObj.message
+                };
+                if (response && response.json) {
+                    response.json(errObj);
+                } else {
+                    request.sessionError = errObj;
+                    next(request, response);
+                }
             }
             return;
         }
