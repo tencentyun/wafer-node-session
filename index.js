@@ -35,12 +35,31 @@ function session(options = {}) {
     const maxAge = options.maxAge || 24 * 3600 * 1000;
 
     return co.wrap(function* middleware(request, response, next) {
+
+        // get session param from header or query
+        // in case of non-express application
+        const getParam = (() => {
+            const headers = {};
+            const queries = {};
+            for (let [key, value] of Object.entries(request.headers)) {
+                headers[key.toUpperCase()] = value;
+            }
+            const query = url.parse(request.url).query;
+            for (let pair of query.split('&')) {
+                const [key, value] = pair.split('=');
+                if (key) {
+                    queries[key.toUpperCase()] = decodeURIComponent(value);
+                }
+            }
+            return key => headers[key.toUpperCase()] || queries[key.toUpperCase()];
+        })();
+
         const isLoginPath = url.parse(request.url).pathname == loginPath;
         const generateSkey = (sessionKey) => sha1(appId + appSecret + sessionKey);
 
         // session check
-        const id = request.header(constants.WX_HEADER_ID);
-        const skey = request.header(constants.WX_HEADER_SKEY);
+        const id = getParam(constants.WX_HEADER_ID);
+        const skey = getParam(constants.WX_HEADER_SKEY);
         if (id && skey) {
             try {
                 const session = yield pify(store.get.bind(store))(id);
@@ -80,7 +99,7 @@ function session(options = {}) {
         // login
         if (isLoginPath) {
             const requireHeader = (key) => {
-                const header = request.header(key);
+                const header = getParam(key);
                 if (!header) {
                     throw new login.LoginError(`请求头里没有找到 ${key}，小程序客户端请配合 mp-session-client 使用，请参考：https://github.com/tencentyun/mp-session-client`);
                 }
