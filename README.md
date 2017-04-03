@@ -41,3 +41,32 @@ app.use('/me', function(request, response, next) {
 ```
 
 上面的会话存储使用了 [connect-redis](https://github.com/tj/connect-redis)，实际上，`wafer-node-session` 支持 `express-session` 的 Store，具体可参考[这个列表](https://github.com/expressjs/session#compatible-session-stores)。
+
+## 客户端配合
+
+小程序需要使用 [wafer-client-sdk](https://github.com/tencentyun/wafer-client-sdk) 发起请求才能正常建立会话，请在客户端进行引入。
+
+```
+npm install -g bower
+bower install wafer-client-sdk
+```
+
+客户端发起请求代码如下：
+
+```js
+var wafer = require('./bower_components/wafer-client-sdk/index');
+var HOST = 'my.example.com';
+
+// 登录地址，注意路径要和中间件配置的 loginPath 一直
+wafer.setLoginUrl(`https://${HOST}/login`);
+wafer.request({
+    login: true,
+    url: `https://${HOST}/user`,
+    success: function(response) {
+        console.log(response);
+    },
+    fail: function(err) {
+        console.log(err);
+    }
+});
+```
