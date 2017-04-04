@@ -29,7 +29,7 @@ function session(options = {}) {
 
     store = options.store || new MemoryStore();
     if (typeof store.set !== 'function' || typeof store.get !== 'function') {
-        throw new Error('mp-session 初始化失败：不是合法的 store');
+        throw new Error('wafer-node-session 初始化失败：不是合法的 store');
     }
 
     const maxAge = options.maxAge || 24 * 3600 * 1000;
@@ -44,7 +44,7 @@ function session(options = {}) {
             for (let [key, value] of Object.entries(request.headers)) {
                 headers[key.toUpperCase()] = value;
             }
-            const query = url.parse(request.url).query;
+            const query = url.parse(request.url).query || '';
             for (let pair of query.split('&')) {
                 const [key, value] = pair.split('=');
                 if (key) {
