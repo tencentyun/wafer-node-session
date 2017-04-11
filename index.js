@@ -41,8 +41,8 @@ function session(options = {}) {
         const getParam = (() => {
             const headers = {};
             const queries = {};
-            for (let [key, value] of Object.entries(request.headers)) {
-                headers[key.toUpperCase()] = value;
+            for (let key of Object.keys(request.headers)) {
+                headers[key.toUpperCase()] = request.headers[key];
             }
             const query = url.parse(request.url).query || '';
             for (let pair of query.split('&')) {
@@ -84,7 +84,7 @@ function session(options = {}) {
                 const errObj = {
                     [constants.WX_SESSION_MAGIC_ID]: 1,
                     error: constants.ERR_INVALID_SESSION,
-                    message: '会话已失效，请重新登录：' + errObj.message
+                    message: '会话已失效，请重新登录：' + (err ? err.message : '未知错误')
                 };
                 if (response && response.json) {
                     response.json(errObj);
