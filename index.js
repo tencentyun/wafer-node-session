@@ -101,14 +101,21 @@ function session(options = {}) {
             const requireHeader = (key) => {
                 const header = getParam(key);
                 if (!header) {
-                    throw new login.LoginError(`请求头里没有找到 ${key}，小程序客户端请配合 mp-session-client 使用，请参考：https://github.com/tencentyun/mp-session-client`);
+                    throw new login.LoginError(`请求头里没有找到 ${key}，小程序客户端请配合 wafer-node-sdk 使用，请参考：https://github.com/tencentyun/wafer-node-sdk`);
                 }
                 return header;
             };
 
-            const code = requireHeader(constants.WX_HEADER_CODE);
-            const encryptData = requireHeader(constants.WX_HEADER_ENCRYPTED_DATA);
-            const iv = requireHeader(constants.WX_HEADER_IV);
+            let code, encryptData, iv;
+            try {
+                code = requireHeader(constants.WX_HEADER_CODE);
+                encryptData = requireHeader(constants.WX_HEADER_ENCRYPTED_DATA);
+                iv = requireHeader(constants.WX_HEADER_IV);
+            } catch (error) {
+                response.json(error);
+                response.end();
+                return;
+            }
 
             const { sessionKey, openId } = yield login({ appId, appSecret, code });
 
