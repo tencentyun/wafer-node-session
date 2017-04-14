@@ -112,7 +112,8 @@ function session(options = {}) {
                 encryptData = requireHeader(constants.WX_HEADER_ENCRYPTED_DATA);
                 iv = requireHeader(constants.WX_HEADER_IV);
             } catch (error) {
-                response.json(error);
+                const { type, message } = error;
+                response.json({ type, message });
                 response.end();
                 return;
             }
